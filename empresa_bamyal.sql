@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.32, for Linux (x86_64)
 --
--- Host: localhost    Database: sistema
+-- Host: localhost    Database: empresa_bamyal
 -- ------------------------------------------------------
 -- Server version	8.0.33-0ubuntu0.22.04.4
 
@@ -55,8 +55,7 @@ CREATE TABLE `DetalleFactura` (
   PRIMARY KEY (`idDetalleFactura`),
   KEY `idFactura` (`idFactura`),
   KEY `idProductos` (`idProductos`),
-  CONSTRAINT `DetalleFactura_ibfk_1` FOREIGN KEY (`idFactura`) REFERENCES `Factura` (`idFactura`),
-  CONSTRAINT `DetalleFactura_ibfk_2` FOREIGN KEY (`idProductos`) REFERENCES `Productos` (`idProducto`)
+  CONSTRAINT `DetalleFactura_ibfk_1` FOREIGN KEY (`idFactura`) REFERENCES `Factura` (`idFactura`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -155,18 +154,15 @@ DROP TABLE IF EXISTS `Productos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Productos` (
-  `idProducto` int NOT NULL,
+  `idProducto` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(20) NOT NULL,
   `descripcion` varchar(250) NOT NULL,
   `stock` int NOT NULL,
   `precio` decimal(10,2) DEFAULT NULL,
   `fechaElaboracion` date NOT NULL,
   `fechaExpiracion` date NOT NULL,
-  `idEstado` int DEFAULT NULL,
-  PRIMARY KEY (`idProducto`),
-  KEY `idEstado` (`idEstado`),
-  CONSTRAINT `Productos_ibfk_2` FOREIGN KEY (`idEstado`) REFERENCES `Estado` (`idEstado`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`idProducto`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,7 +171,6 @@ CREATE TABLE `Productos` (
 
 LOCK TABLES `Productos` WRITE;
 /*!40000 ALTER TABLE `Productos` DISABLE KEYS */;
-INSERT INTO `Productos` VALUES (1,'Rubor','para la cara ',4,12.35,'2023-08-09','2023-04-02',1);
 /*!40000 ALTER TABLE `Productos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -271,4 +266,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-08-01 16:01:27
+-- Dump completed on 2023-08-01 19:36:20

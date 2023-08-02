@@ -19,6 +19,7 @@ $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
 
 
+
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
@@ -95,7 +96,7 @@ $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
                 </div>      
                 <div class="form-group">
                 <label for="edad" class="col-form-label">Precio:</label>
-                <input type="number" class="form-control" id="precio">
+                <input type="number" step="0.01" class="form-control" id="precio">
                 </div>   
                 <div class="form-group">
                 <label for="edad" class="col-form-label">Fecha Elaboracion:</label>

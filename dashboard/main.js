@@ -24,19 +24,21 @@ $(document).ready(function(){
         }
     });
     
-    $("#btnNuevo").click(function () {
+
+    var fila;
+    var id;
+    var opcion;
+
+    $("#btnNuevo").click(function() {
         $("#formPersonas").trigger("reset");
         $(".modal-header").css("background-color", "#1cc88a");
         $(".modal-header").css("color", "white");
-        $(".modal-title").text("Nueva Productos");
+        $(".modal-title").text("Nueva Producto");
         $("#modalCRUD").modal("show");
-        id = null;
-        opcion = 1; //alta
+        opcion = 1; // Cambiar 'alta' a '1'
     });
 
-    var fila; //capturar la fila para editar o borrar el registro
-
-    $(document).on("click", ".btnEditar", function(){
+    $(document).on("click", ".btnEditar", function() {
         fila = $(this).closest("tr");
         id = parseInt(fila.find('td:eq(0)').text());
         nombre = fila.find('td:eq(1)').text();
@@ -45,10 +47,6 @@ $(document).ready(function(){
         precio = parseFloat(fila.find('td:eq(4)').text());
         fechaElaboracion = fila.find('td:eq(5)').text();
         fechaExpiracion = fila.find('td:eq(6)').text();
-        
-        // Nuevos campos
-
-        // ... Puedes agregar más variables para los demás campos que necesitas ...
 
         $("#nombre").val(nombre);
         $("#descripcion").val(descripcion);
@@ -56,74 +54,109 @@ $(document).ready(function(){
         $("#precio").val(precio);
         $("#fechaElaboracion").val(fechaElaboracion);
         $("#fechaExpiracion").val(fechaExpiracion);
-        // Nuevos campos
-        // ... Asegúrate de agregar más líneas como estas para los demás campos que necesitas ...
 
         opcion = 2; //editar
 
         $(".modal-header").css("background-color", "#4e73df");
         $(".modal-header").css("color", "white");
-        $(".modal-title").text("Editar Producto");            
+        $(".modal-title").text("Editar Producto");
         $("#modalCRUD").modal("show");
     });
 
-    $(document).on("click", ".btnBorrar", function(){    
+    $(document).on("click", ".btnBorrar", function() {
         fila = $(this);
         id = parseInt($(this).closest("tr").find('td:eq(0)').text());
         opcion = 3 //borrar
-        var respuesta = confirm("¿Está seguro de eliminar el registro: "+id+"?");
-        if(respuesta){
+        var respuesta = confirm("¿Está seguro de eliminar el registro: " + id + "?");
+        if (respuesta) {
             $.ajax({
                 url: "bd/crud.php",
                 type: "POST",
                 dataType: "json",
-                data: {opcion:opcion, id:id},
-                success: function(){
-                    tablaPersonas.row(fila.parents('tr')).remove().draw();
+                data: { opcion: opcion, id: id },
+                success: function(data) {
+                    if ('mensaje' in data) {
+                        alert(data.mensaje);
+                        tablaPersonas.row(fila.parents('tr')).remove().draw();
+                    } else if ('error' in data) {
+                        alert(data.error);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                    alert("Error en la petición AJAX");
                 }
             });
-        }   
+        }
     });
 
-    $("#formPersonas").submit(function(e){
-        e.preventDefault();
-        nombre = $.trim($("#nombre").val());
-        descripcion = $.trim($("#descripcion").val());
-        stock = parseInt($("#stock").val());
-        precio = parseFloat($("#precio").val());
-        fechaElaboracion = $.trim($("#fechaElaboracion").val());
-        fechaExpiracion = $.trim($("#fechaExpiracion").val());
-        // Nuevos campos
+    $("#formPersonas").submit(function(e) {
+    e.preventDefault();
+    nombre = $.trim($("#nombre").val());
+    descripcion = $.trim($("#descripcion").val());
+    stock = parseInt($("#stock").val());
+    precio = parseFloat($("#precio").val());
+    fechaElaboracion = $.trim($("#fechaElaboracion").val());
+    fechaExpiracion = $.trim($("#fechaExpiracion").val());
 
-        // ... Puedes agregar más variables para los demás campos que necesitas ...
 
-        $.ajax({
-            url: "bd/crud.php",
-            type: "POST",
-            dataType: "json",
-            data: {
-                nombre: nombre,
-                descripcion: descripcion,
-                stock: stock,
-                precio: precio,
-                fechaElaboracion: fechaElaboracion,
-                fechaExpiracion: fechaExpiracion,
-                idProducto: idProducto, // Corregido: Cambiado "id" por "idProducto"
-                opcion: opcion
-            },
-            success: function (data) {
-                
-           
-                    if (opcion == 1) { // Alta
-                        tablaPersonas.row.add([data[0].idProducto, data[0].nombre, data[0].descripcion, data[0].stock, data[0].precio, data[0].fechaElaboracion, data[0].fechaExpiracion]).draw();
-                    } else if (opcion == 2) { // Modificación
-                        tablaPersonas.row(fila).data([data[0].idProducto, data[0].nombre, data[0].descripcion, data[0].stock, data[0].precio, data[0].fechaElaboracion, data[0].fechaExpiracion]).draw();
-                    } else if (opcion == 3) { // Baja
-                        tablaPersonas.row(fila).remove().draw();
-                    }
+    if (nombre === '' || descripcion === '' || isNaN(stock) || isNaN(precio) || fechaElaboracion === '' || fechaExpiracion === '') {
+        alert("Por favor, completa todos los campos.");
+        return;
+    }
 
-            }     
-        });
-        $("#modalCRUD").modal("hide");    
+
+    var dataToSend = {
+        nombre: nombre,
+        descripcion: descripcion,
+        stock: stock,
+        precio: precio,
+        fechaElaboracion: fechaElaboracion,
+        fechaExpiracion: fechaExpiracion,
+        id:id,
+        opcion: opcion // Corregido: mueve la variable opcion aquí
+    };
+
+
+ 
+    $.ajax({
+        url: "bd/crud.php",
+        type: "POST",
+        dataType: "json",
+        data: dataToSend,
+        success: function(data) {
+            console.log(data);
+            id = data[0].idProducto;
+            nombre = data[0].nombre;
+            descripcion = data[0].descripcion;
+            stock = data[0].stock;
+            precio = data[0].precio;
+            fechaElaboracion = data[0].fechaElaboracion;
+            fechaExpiracion = data[0].fechaExpiracion;
+
+            if (opcion === 2) { // Alta
+                tablaPersonas.row(fila).data([id, nombre, descripcion, stock, precio, fechaElaboracion, fechaExpiracion]).draw();
+            } else { // Modificación
+                tablaPersonas.row.add([id,nombre, descripcion, stock, precio, fechaElaboracion, fechaExpiracion]).draw();
+
+            }
+
+            $("#modalCRUD").modal("hide");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR.responseText);
+            console.log("Error en la petición AJAX: " + jqXHR.responseText);
+            alert("Error en la petición AJAX: " + textStatus + ", " + errorThrown);
+        }
     });
+});
+
+
+
+
+
+
+
+
+
 });
